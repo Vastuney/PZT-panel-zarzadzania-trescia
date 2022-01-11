@@ -19,11 +19,11 @@ PZT - Panel zarządzania treścią. W zamyślę ma zasłużyć szybkiemu i łatw
 <a name="funkcje"></a>
 ## Funkcje (BETA)
 
-### Logowanie / Rejestracja
+#### Logowanie / Rejestracja
 * Logowanie
 * Rejestracja oparta o tokeny
 
-### Wrzucanie plików na serwer
+#### Wrzucanie plików na serwer
 * Upload plików na serwer
 * Wyświetlanie plików
 * Udostępnianie plików między użytkownikami
