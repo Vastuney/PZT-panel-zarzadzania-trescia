@@ -1,0 +1,8 @@
+$a = new GetFiles(1);
+$files = $a->getFiles();
+print_r($files);
+echo "<br/><br/>";
+foreach($files as $row => $value){
+    foreach($value as $row2 => $value2)
+        echo $row2." ".$value2."<br/>";
+}

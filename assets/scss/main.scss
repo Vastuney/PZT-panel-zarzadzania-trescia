@@ -1,0 +1,417 @@
+@import "reset";
+@import "config";
+@import "mixin";
+
+li.dropdown {
+  position: relative;
+  cursor: pointer;
+  ul.dropdown {
+    position: absolute;
+    top:$padding;
+    right:50%;
+    transform: translateX(50%);
+    background:$secondwhite;
+    width: auto;
+    height: auto;
+    display: none;
+    color:$funky-black;
+    font-family: $font;
+    padding: $halfpadding;
+    white-space: nowrap;
+    flex-direction: column;
+    gap:$halfpadding;
+    @include transition($transition);
+    box-sizing: border-box;
+    &.active {
+      display: flex;
+    }
+  }
+}
+
+
+/* Mixed content */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: $shiny-blue $nearly-white;
+}
+
+*::-webkit-scrollbar {
+  width: 8px;
+}
+
+*::-webkit-scrollbar-track {
+  background: $nearly-white;
+}
+
+*::-webkit-scrollbar-thumb {
+  background-color: $shiny-blue;
+  border-radius: 10px;
+  border: none;
+}
+
+h1 {
+  font-size:calc($fontsize + $fontsize);
+  font-family:$font;
+  font-weight: bold;
+}
+h2 {
+  font-weight: bold;
+  font-size:calc($fontsize + 0.7em);
+}
+h3 {
+  font-weight: bold;
+  font-size:$fontsize;
+}
+span {
+  color:$nearly-white;
+}
+.alert {
+  @include flex(row, space-between, center);
+  display: none;
+  position: absolute;
+  top:0;
+  left:0;
+  z-index: 99999999;
+  width: 100%;
+  height: auto;
+  background:grey;
+  font-size:$fontsize;
+  text-align: center;
+  color:$white;
+  padding:$halfpadding;
+  font-weight: bold;
+  font-family: $font;
+  box-sizing: border-box;
+  &.alert-danger {
+    background:red;
+  }
+  &.alert-primary {
+    background:$shiny-blue;
+  }
+  &.active {
+    display: flex;
+  }
+  .btn-close {
+    border:none;
+    outline:none;
+    width: auto;
+    height: auto;
+    padding:0.25em 0.5em;
+    color:$white;
+    font-weight: bold;
+    font-size:$fontsize;
+    background:transparent;
+    cursor: pointer;
+  }
+}
+.usage {
+  @include border(20px);
+  width: auto;
+  height: auto;
+  padding:$halfpadding $padding;
+  background-color:$shiny-blue;
+  color:$white;
+  font-weight: bold;
+  white-space:nowrap;
+}
+.search {
+  form {
+    padding-left:20px;
+    box-sizing: border-box;
+    input {
+      color:$nearly-white;
+      font-size:$fontsize;
+      &::placeholder {
+        color:inherit;
+      }
+    }
+  }
+}
+.button {
+  border:none;
+  outline:none;
+  @include border(20px);
+  width: auto;
+  height: auto;
+  padding:$halfpadding $padding;
+  background-color:$black;
+  color:$white;
+  font-weight: bold;
+  font-size:$fontsize;
+  cursor: pointer;
+  @include transition($transition);
+  &.info {
+    background-color:$shiny-blue;
+    &:hover, &:active, &:focus {
+      background-color: darken($shiny-blue, 5%);
+    }
+  }
+  &.danger {
+    background-color:$red;
+    &:hover, &:active, &:focus {
+      background-color: darken($red, 5%);
+    }
+  }
+}
+.seeMoreContent {
+  display: none;
+  &.active {
+    display: block;
+  }
+}
+.modal {
+  @include flex(column, flex-start, flex-start);
+  display: none;
+  position: absolute;
+  width: 30vw;
+  max-height: 80vh;
+  top:50%;
+  left:50%;
+  transform: translate(-50%, -50%);
+  height: auto;
+  overflow-x:hidden;
+  background:$secondwhite;
+  box-sizing: border-box;
+  z-index: 1000;
+  color:$funky-black;
+  @include shadow();
+  &.active {
+    display: flex;
+  }
+  .modal_top {
+    @include flex(row, space-between, center);
+    width: 100%;
+    padding:$padding;
+    border-bottom:1px solid $funky-white;
+    box-sizing: border-box;
+    i {
+      font-size:calc($fontsize + $fontsize);
+    }
+  }
+  .modal_container {
+    width: 100%;
+    height: auto;
+    padding:$padding;
+    box-sizing: border-box;
+  }
+}
+.form_upload {
+  width: 100%;
+  height: auto;
+  form {
+    @include flex(column, flex-start, flex-start);
+    gap: $halfpadding ;
+    width: 100%;
+    height: auto;
+    label {
+      font-size:calc($fontsize + 0.2em);
+      color:darken($nearly-white, 20%);
+    }
+    input {
+      width: 100%;
+      height: auto;
+      background:transparent;
+      border:1px solid $nearly-white;
+      @include border(4px);
+      font-family: $font;
+      font-size: $fontsize;
+      padding:$halfpadding;
+      &:hover, &:focus, &:active {
+        border:1px solid $nearly-white;
+      }
+      &[type="submit"] {
+        background:$shiny-blue;
+        color:$white;
+        font-weight: bold;
+        border:none;
+        &:hover {
+          background: darken($shiny-blue, 5%);
+        }
+      }
+      &[type="file"] {
+        display: none;
+      }
+    }
+    button.upload {
+      @include flex(column, center, center);
+      gap:2em;
+      width: 100%;
+      height: auto;
+      border:1px dashed $nearly-white;
+      background:transparent;
+      padding:$padding;
+      font-size:$fontsize;
+      @include transition($transition);
+      &:hover, &:active, &:focus {
+        border: 1px dashed $shiny-blue
+      }
+      a {
+        color:$shiny-blue;
+        font-weight: bold;
+      }
+    }
+  }
+}
+input[type="submit"] {
+  border:none;
+  outline:none;
+  @include border(20px);
+  width: 100%;
+  height: auto;
+  padding:$halfpadding $padding;
+  background-color:$black;
+  color:$white;
+  font-weight: bold;
+  cursor: pointer;
+  @include transition($transition);
+  &.info {
+    background-color:$shiny-blue;
+    &:hover, &:active, &:focus {
+      background-color: darken($shiny-blue, 5%);
+    }
+  }
+  &.danger {
+    background-color:$red;
+    &:hover, &:active, &:focus {
+      background-color: darken($red, 5%);
+    }
+  }
+}
+/* End of mixed content */
+a, i {
+  color:$funky-black;
+  cursor: pointer;
+  @include transition($transition);
+  &:hover, &:active, &:focus {
+    color:$black !important;
+  }
+}
+
+nav, .usage, form, input {
+  font-family:$font;
+}
+.site {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+}
+nav {
+  @include flex(column, space-between, flex-start);
+  position: relative;
+  width: max-content;
+  height: 100vh;
+  background:$funky-white;
+  padding: calc($padding + 1em);
+  box-sizing: border-box;
+  color:$funky-black;
+  .logo {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size:calc($fontsize + $fontsize);
+  }
+  ul {
+    display: flex;
+    flex-direction: column;
+    gap:$padding;
+  }
+  ul a {
+    opacity: 0.5;
+    font-weight: 700;
+    text-transform: uppercase;
+    font-size:$fontsize;
+    &:hover {
+      opacity: 0.9;
+    }
+  }
+}
+header {
+  @include flex(column, flex-start, flex-start);
+  width: 100%;
+  height: max-content;
+  padding:$padding calc($padding + $halfpadding);
+  box-sizing: border-box;
+  .top {
+    @include flex(row, space-between, flex-start);
+    width: 100%;
+    div {
+      @include flex(row, center, center);
+      i {
+        color:$nearly-white;
+        font-size:1.5em;
+        font-weight: thin;
+      }
+      &:nth-child(2) {
+        gap:$padding;
+        img {
+          width: 20px;
+          height: 20px;
+          @include border(100%);
+        }
+      }
+    }
+  }
+}
+.content {
+  width: 100%;
+  height: calc(100vh - 100px);
+  i {
+    color:$nearly-white;
+  }
+  main {
+    width: 100%;
+    height: 100%;
+    box-sizing: border-box;
+    padding:$halfpadding 0em;
+    font-family: $font;
+    .title {
+      @include flex(row, space-between, center);
+      width: 100%;
+      height: auto;
+      padding:$padding 0em;
+      box-sizing: border-box;
+    }
+    .container {
+      width: 100%;
+      height: calc(100% - 5em);
+      box-sizing:border-box;
+      overflow-x:hidden;
+      padding-right:$halfpadding;
+      .label {
+        @include flex(row, space-between, center);
+        width: 100%;
+        height: auto;
+        border:1px solid $nearly-white;
+        @include border(4px);
+        @include contentItem();
+        @include transition($transition);
+        flex-wrap: wrap;
+        &:hover, &:active, &:focus {
+          border: 1px solid darken($nearly-white, 50%);
+        }
+        .col:nth-child(1) {
+          @include flex(row, space-evenly, center);
+          gap:$padding;
+          width: 20%;
+          border-right:1px solid $nearly-white;
+          box-sizing:border-box;
+          span a {
+            color:inherit;
+            font-weight: bold;
+          }
+        }
+        .col:nth-child(2) {
+          @include flex(row, space-between, center);
+          width: 80%;
+          padding-left:$padding;
+          box-sizing:border-box;
+          div {
+            @include flex(column, space-between, flex-start);
+            gap:0.5em;
+          }
+        }
+      }
+    }
+  }
+}

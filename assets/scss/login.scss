@@ -1,0 +1,80 @@
+@import "reset";
+@import "config";
+@import "mixin";
+
+header {
+  @include flex(column, center, center);
+  width: 100%;
+  height: 50vh;
+  background:$shiny-blue;
+  h1 {
+    color:$white;
+    font-size:calc($fontsize + $fontsize);
+    font-weight: bold;
+    font-family: $font;
+    i {
+      font-weight: bold;
+    }
+  }
+}
+main {
+  @include flex(column, flex-start, center);
+  width: 100%;
+  height: 50vh;
+  font-family: $font;
+  form {
+    @include flex(column, flex-start, center);
+    @include shadow();
+    width: auto;
+    height: auto;
+    padding:$padding calc($padding + $halfpadding);
+    background:$secondwhite;
+    margin-top:-10em;
+    h2 {
+      font-size:1.5em;
+      margin-bottom:$halfpadding;
+    }
+    label {
+      width: 100%;
+      height: auto;
+      color:$nearly-white;
+      padding:$halfpadding;
+    }
+    input {
+      width: 100%;
+      height: auto;
+      background:transparent;
+      border:1px solid $nearly-white;
+      @include border(4px);
+      font-family: $font;
+      font-size: $fontsize;
+      padding:$halfpadding;
+      &:hover, &:focus, &:active {
+        border:1px solid $funky-black;
+      }
+      &[type="submit"] {
+        background:$shiny-blue;
+        color:$white;
+        font-weight: bold;
+        border:none;
+        margin-top:$halfpadding;
+        margin-bottom:$halfpadding;
+        cursor: pointer;
+        &:hover {
+          background: darken($shiny-blue, 5%);
+        }
+      }
+    }
+  }
+  span {
+    color:$nearly-white;
+    a {
+      font-weight: bold;
+      color:$funky-black;
+      &:hover, &:active, &:focus {
+        color:$black;
+      }
+    }
+
+  }
+}
