@@ -1,61 +1,11 @@
 <?php
 
-function extensions() {
-  global $config;
-  $string = " ";
-  $array = $config['uploadExtensions'];
-  $toEnd = count($array);
-  foreach($array as $key => $value)
-  {
-    if (0 === --$toEnd)
-    {
-      $string .= $value;
-    } else
-      {
-        $string .= $value.", ";
-      }
-  }
-  return $string;
-}
-function uploadSize($bytes) {
-    global $config;
-    $units = array('B', 'KB', 'MB', 'GB', 'TB');
-    $precision = 0;
-
-    $bytes = max($bytes, 0);
-    $pow = floor(($bytes ? log($bytes) : 0) / log(1024));
-    $pow = min($pow, count($units) - 1);
-    $bytes /= pow(1024, $pow);
-
-    return round($bytes, $precision) . ' ' . $units[$pow];
-}
-function usedSpace($userid) {
-  global $config;
-  $bytestotal = 0;
-  $bytestotal2 = 0;
-  $path = realpath($config['filesPath'].$userid."/");
-  $path2 = realpath($config['codePath'].$userid."/");
-    if($path!==false && $path!='' && file_exists($path)){
-      foreach(new RecursiveIteratorIterator(new RecursiveDirectoryIterator($path, FilesystemIterator::SKIP_DOTS)) as $object){
-        $bytestotal += $object->getSize();
-      }
-    }
-    if($path2!==false && $path2!='' && file_exists($path2)){
-      foreach(new RecursiveIteratorIterator(new RecursiveDirectoryIterator($path2, FilesystemIterator::SKIP_DOTS)) as $object){
-        $bytestotal += $object->getSize();
-      }
-    }
-  return $bytestotal;
-
-}
-
 class Workspace
 {
   public $userid;
   public $filename;
   public $filepath;
   public $codePath;
-  public $ifWorkspace;
 
   function __construct($userid)
   {
@@ -65,28 +15,22 @@ class Workspace
     $this->codePath = $config['codePath'].$this->userid;
   }
 
-  public function generateFilename()
-  {
-    $this->filename = substr(str_shuffle('abcdefghjkmnpqrstuvwxyzABCDEFGHJKMNPQRSTUVWXYZ23456789'),0,16);
-    return $this;
-  }
-
   public function ifWorkspace()
   {
     if(is_dir($this->filepath) || is_dir($this->codePath))
     {
-      $this->ifWorkspace = true;
+      return true;
     } else
       {
-        $this->ifWorkspace = false;
+        return false;
       }
     return $this;
   }
   public function createWorkspace()
   {
-    if($this->ifWorkspace)
+    if($this->ifWorkspace())
     {
-      new Feedback(false, "Przestrzeń robocza już istnieje");
+      new Feedback("error", "Przestrzeń robocza już istnieje");
       return;
     } else
       {
@@ -102,17 +46,27 @@ class Files extends User
   public $filepath;
   public $codepath;
   public $check;
-  function __construct($userid)
+  function __construct($userid, $type)
   {
     global $config;
     $this->userid = $userid;
     $this->filepath = $config['filesPath'].$userid."/";
     $this->codepath = $config['codePath'].$userid."/";
+    $this->type = $type;
+    switch ($type)
+    {
+        case "files":
+            $this->path = $this->filepath;
+            break;
+        case "codes":
+            $this->path = $this->codepath;
+            break;
+    }
     if($this->existUser("id", $userid)) {
       $this->check = true;
     } else {
       $this->check = false;
-      new Feedback(false, "Użytkownik nie istnieje");
+      new Feedback("error", "Użytkownik nie istnieje");
       return;
     }
     return $this;
@@ -130,24 +84,13 @@ class Files extends User
       $db->freeRun($sql2);
     } else
       {
-        new Feedback(false, "Użytkownik nie istnieje");
+        new Feedback("error", "Użytkownik nie istnieje");
         return;
       }
   }
-  public function ifExist($type, $filename)
+  public function ifExist($filename)
   {
-    if($type == "files")
-    {
-      $path = $this->filepath;
-    } else if($type == "codes")
-      {
-        $path = $this->codepath;
-      } else
-        {
-          new Feedback(false, "Nierozpoznany typ pliku");
-          return;
-        }
-    if(file_exists($path.$filename))
+    if(file_exists($this->path.$filename))
     {
       return true;
     } else
@@ -155,29 +98,20 @@ class Files extends User
         return false;
       }
   }
-  public function getFiles($type)
+  public function getFiles()
   {
     if($this->check)
     {
-      switch ($type)
-      {
-          case "files":
-              $path = $this->filepath;
-              break;
-          case "codes":
-              $path = $this->codepath;
-              break;
-      }
-      $files = array_diff(scandir($path), array('.', '..'));
+      $files = array_diff(scandir($this->path), array('.', '..'));
       $array = [];
       foreach($files as $file) {
-        $a = [$file => filesize($path.$file)];
+        $a = [$file => filesize($this->path.$file)];
         array_push($array, $a);
       }
       return $array;
     } else
       {
-        new Feedback(false, "Użytkownik nie istnieje");
+        new Feedback("error", "Użytkownik nie istnieje");
         return;
       }
   }
@@ -187,139 +121,131 @@ class Files extends User
     $ext = pathinfo($path, PATHINFO_EXTENSION);
     return $ext;
   }
-  public function upload($type, $title, $file)
+  public function upload($title, $file)
   {
     global $config;
+    $validate = validate(["title" => $title]);
+    $title = $validate['title'];
     if($this->check)
     {
-      if(!$this->ifExist($type, basename($file['name'])))
+      if(!$this->ifExist(basename($file['name'])))
       {
         if( in_array($this->fileExt($file), $config['uploadExtensions'] ) )
         {
           if(($file['size'] <= $config['uploadSize']))
           {
-            switch ($type)
+            if(usedSpace($_SESSION['id']) < $config['maxSpace'])
             {
-                case "files":
-                    $path = $this->filepath;
-                    break;
-                case "codes":
-                    $path = $this->codepath;
-                    break;
-            }
-            $uploadfile = $path . basename($file['name']);
-            if (move_uploaded_file($file['tmp_name'], $uploadfile)) {
-              $date = time();
-              $values = [
-                [ "type" => "char", "val" => "0" ],
-                [ "type" => "char", "val" => $file['name'] ],
-                [ "type" => "char", "val" => $title ],
-                [ "type" => "char", "val" => $this->userid ],
-                [ "type" => "char", "val" => $date ],
-                [ "type" => "char", "val" => "0" ],
-                [ "type" => "char", "val" => $file['size'] ]
-              ];
-              $db = new DB_PDO();
-              $db = $db->insertInto($type, $values);
-              new Feedback(true, "Pomyślnie dodano plik");
-              return;
-            } else {
-              new Feedback(false, "Nie udało się wrzucić pliku");
-              return;
-            }
+              $space = intval(usedSpace($_SESSION['id'])) + intval($file['size']);
+              if($space < $config['maxSpace'])
+              {
+                $uploadfile = $this->path . basename($file['name']);
+                if (move_uploaded_file($file['tmp_name'], $uploadfile)) {
+                  $date = time();
+                  $values = [
+                    [ "type" => "char", "val" => "0" ],
+                    [ "type" => "char", "val" => $file['name'] ],
+                    [ "type" => "char", "val" => $title ],
+                    [ "type" => "char", "val" => $this->userid ],
+                    [ "type" => "char", "val" => $date ],
+                    [ "type" => "char", "val" => "0" ],
+                    [ "type" => "char", "val" => $file['size'] ]
+                  ];
+                  $db = new DB_PDO();
+                  $db = $db->insertInto($this->type, $values);
+                  new Feedback("location", "/index.php");
+                  return;
+                } else {
+                  new Feedback("error", "Nie udało się wrzucić pliku");
+                  return;
+                }
+              } else
+                {
+                  new Feedback("error", "Nie starczy Ci miejsca na pliki !");
+                  return;
+                }
+            } else
+              {
+                new Feedback("error", "Wykorzystałeś limit dysku, usuń pliki.");
+                return;
+              }
           } else
             {
-              new Feedback(false, "Plik jest za duży maksymalna wartość to ".uploadSize());
+              new Feedback("error", "Plik jest za duży maksymalna wartość to ".uploadSize());
               return;
             }
         } else
           {
-            new Feedback(false, "Niepoprawny format pliku");
+            new Feedback("error", "Niepoprawny format pliku");
             return;
           }
 
       } else
         {
-          new Feedback(false, "Taki plik już istnieje");
+          new Feedback("error", "Taki plik już istnieje");
           return;
         }
     } else
       {
-        new Feedback(false, "Użytkownik nie istnieje");
+        new Feedback("error", "Użytkownik nie istnieje");
         return;
       }
   }
-  public function fileDelete($type, $id)
+  public function fileDelete($id)
   {
+    $validate = validate(["id" => $id]);
+    $id = $validate['id'];
     if($this->check)
     {
-      switch ($type)
-      {
-          case "files":
-              $path = $this->filepath;
-              break;
-          case "codes":
-              $path = $this->codepath;
-              break;
-      }
       $db = new DB_PDO();
-      $result = $db->selectWhere($type, "id", "=", $id, "char");
+      $result = $db->selectWhere($this->type, "id", "=", $id, "char");
       $row = $result->fetch();
-      if($this->ifExist($type, $row['filename']) && $row['addedby'] == $this->userid)
+      if($this->ifExist($row['filename']) && $row['addedby'] == $this->userid)
       {
-        if (unlink($path.$row['filename']))
+        if (unlink($this->path.$row['filename']))
         {
           $db = new DB_PDO();
-          $db->freeRun("DELETE FROM `{$type}` WHERE id = '{$id}'");
-          new Feedback(true, "Udało się usunąć plik");
+          $db->freeRun("DELETE FROM `{$this->type}` WHERE id = '{$id}'");
+          new Feedback("location", "/index.php");
           return;
         } else
           {
-            new Feedback(false, "Wystąpił błąd przy usuwaniu pliku");
+            new Feedback("error", "Wystąpił błąd przy usuwaniu pliku");
             return;
           }
 
       } else
         {
-          new Feedback(false, "Plik nie istnieje");
+          new Feedback("error", "Plik nie istnieje");
           return;
         }
     } else
       {
-        new Feedback(false, "Użytkownik nie istnieje");
+        new Feedback("error", "Użytkownik nie istnieje");
         return;
       }
   }
 
-  public function showFiles($type)
+  public function showFiles()
   {
-    switch ($type)
-    {
-        case "files":
-            $path = $this->filepath;
-            break;
-        case "codes":
-            $path = $this->codepath;
-            break;
-    }
-    $files = $this->getFiles($type);
+    $files = $this->getFiles();
     $currentuser = $_SESSION['id'];
     $db = new DB_PDO();
-    $sql = "SELECT * FROM `{$type}` WHERE `addedby` = {$currentuser} OR `sharedto` LIKE '%{$currentuser}%'";
+    $sql = "SELECT * FROM `{$this->type}` WHERE `addedby` = {$currentuser} OR `sharedto` LIKE '%{$currentuser}%'";
     $result = $db->freeRun($sql);
     while($row = $result->fetch()) {
-      $class = new Share($type, $row['id'], $_SESSION['id'], $row['sharedto']);
+      $class = new Share($this->type, $row['id'], $_SESSION['id'], $row['sharedto']);
       $class = $class->labels();
       echo
       '
-      <div class="label">
+      <div class="label search_index">
         <div class="col">
       ';
           if($_SESSION['id'] == $row['addedby'])
           {
             echo
             '
-            <i class="fas fa-trash delete" for="'.$type.'" data-id="'.$row['id'].'"></i>
+            <i class="fas fa-trash delete" for="'.$this->type.'" data-id="'.$row['id'].'"></i>
             <i class="fas fa-share seeModal"></i>
             <div class="modal">
               <div class="modal_top">
@@ -350,11 +276,11 @@ class Files extends User
         </div>
         <div class="col">
           <div>
-            <h3>'.$row['title'].'</h3>
+            <h3 class="search_title">'.$row['title'].'</h3>
             <span>'.uploadSize($row['size']).'</span>
           </div>
           <div>
-            <a href="'.$path.$row['filename'].'"><button class="button info">Pobierz</button></a>
+            <a href="'.$this->path.$row['filename'].'"><button class="button info">Pobierz</button></a>
           </div>
         </div>
       </div>
@@ -372,9 +298,10 @@ class Share extends User
   public $sharedto;
   function __construct($type, $fileid, $userid, $shared = 0)
   {
-    $this->type = $type;
-    $this->fileid = $fileid;
-    $this->userid = $userid;
+    $validate = validate(["type" => $type, "fileid" => $fileid, "userid" => $userid]);
+    $this->type = $validate["type"];
+    $this->fileid = $validate["fileid"];
+    $this->userid = $validate["userid"];
     $this->sharedto = $shared;
     return $this;
   }
@@ -457,21 +384,23 @@ class Share extends User
           $db = $db->freeRun($sql);
           if($db)
           {
-            new Feedback(true, "Udostępniłeś plik");
+            $class = new Notifications($this->userid);
+            $class->sendNotifications('Plik '.$row['title']." został Ci udostępniony");
+            new Feedback("success", "Udostępniłeś plik");
             return;
           } else
             {
-              new Feedback(false, "Nie udało się udostępnić pliku");
+              new Feedback("error", "Nie udało się udostępnić pliku");
               return;
             }
       } else
         {
-          new Feedback(false, "Plik nie istnieje");
+          new Feedback("error", "Plik nie istnieje");
           return;
         }
     } else
       {
-        new Feedback(false, "Autoryzacja nieudana");
+        new Feedback("error", "Autoryzacja nieudana");
         return;
       }
   }
@@ -493,21 +422,23 @@ class Share extends User
           $db = $db->freeRun($sql);
           if($db)
           {
-            new Feedback(true, "Usunałeś udostępnianie pliku");
+            $class = new Notifications($this->userid);
+            $class->sendNotifications('Plik '.$row['title']." nie jest Ci już udostępniany");
+            new Feedback("success", "Usunałeś udostępnianie pliku");
             return;
           } else
             {
-              new Feedback(false, "Nie udało się usunąć udostępniania pliku");
+              new Feedback("error", "Nie udało się usunąć udostępniania pliku");
               return;
             }
       } else
         {
-          new Feedback(false, "Plik nie istnieje");
+          new Feedback("error", "Plik nie istnieje");
           return;
         }
     } else
       {
-        new Feedback(false, "Autoryzacja nieudana");
+        new Feedback("error", "Autoryzacja nieudana");
         return;
       }
   }

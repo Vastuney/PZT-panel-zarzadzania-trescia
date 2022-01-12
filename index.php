@@ -3,7 +3,6 @@ require($_SERVER["DOCUMENT_ROOT"]."/lib/main.php");
 require($_SERVER["DOCUMENT_ROOT"]."/includes/root/head.php");
 require($_SERVER["DOCUMENT_ROOT"]."/includes/root/header.php");
 ?>
-
             <div class="title">
               <h1>Twoje ostatnie pliki</h1>
               <button class="button info seeModal">Wrzuć nowy plik</button>
@@ -34,8 +33,8 @@ require($_SERVER["DOCUMENT_ROOT"]."/includes/root/header.php");
             </div>
             <div class="container">
               <?php
-                $class = new Files($_SESSION['id']);
-                $class = $class->showFiles("files");
+                $class = new Files($_SESSION['id'], "files");
+                $class = $class->showFiles();
                ?>
               <?php
               $class = new Share("files", "19", $_SESSION['id']);

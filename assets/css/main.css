@@ -571,4 +571,49 @@ header .top div:nth-child(2) img {
   gap: 0.5em;
 }
 
+.multi-items {
+  width: 100%;
+  height: auto;
+  overflow: hidden;
+  box-sizing: border-box;
+}
+.multi-items .multi-items-navigation {
+  width: auto;
+  height: auto;
+  background-color: transparent;
+  box-sizing: border-box;
+  margin-bottom: 2.5em;
+}
+.multi-items .multi-items-navigation ul {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+  align-items: center;
+  gap: 1em;
+  padding-top: calc(1em + 3px);
+  box-sizing: border-box;
+}
+.multi-items .multi-items-navigation ul li {
+  padding-bottom: 1em;
+  box-sizing: border-box;
+  border-bottom: 3px solid transparent;
+  cursor: pointer;
+  font-weight: bold;
+  font-size: 1.1em;
+}
+.multi-items .multi-items-navigation ul li.active {
+  box-sizing: border-box;
+  border-bottom: 3px solid #2e2bff;
+}
+.multi-items .multi-items-item {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: flex-start;
+  display: none;
+}
+.multi-items .multi-items-item.active {
+  display: flex;
+}
+
 /*# sourceMappingURL=main.css.map */

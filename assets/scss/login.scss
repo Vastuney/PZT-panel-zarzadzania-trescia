@@ -30,40 +30,52 @@ main {
     padding:$padding calc($padding + $halfpadding);
     background:$secondwhite;
     margin-top:-10em;
+    gap:$halfpadding;
+    div {
+      @include flex(row, center, center);
+      width: 100%;
+      label {
+        min-width: 50px;
+        height: auto;
+        color:$nearly-white;
+        padding:$halfpadding;
+      }
+      input {
+        width: 100%;
+        height: auto;
+        background:transparent;
+        border:1px solid $nearly-white;
+        @include border(4px);
+        font-family: $font;
+        font-size: $fontsize;
+        padding:$halfpadding;
+        &:hover, &:focus, &:active {
+          border:1px solid $funky-black;
+        }
+        &[type="submit"] {
+          background:$shiny-blue;
+          color:$white;
+          font-weight: bold;
+          border:none;
+          margin-top:$halfpadding;
+          margin-bottom:$halfpadding;
+          cursor: pointer;
+          &:hover {
+            background: darken($shiny-blue, 5%);
+          }
+        }
+        &[type="text"] {
+          border:1px solid $nearly-white;
+          @include border(4px);
+          &:hover, &:focus, &:active {
+            border:1px solid $funky-black;
+          }
+        }
+      }
+    }
     h2 {
       font-size:1.5em;
       margin-bottom:$halfpadding;
-    }
-    label {
-      width: 100%;
-      height: auto;
-      color:$nearly-white;
-      padding:$halfpadding;
-    }
-    input {
-      width: 100%;
-      height: auto;
-      background:transparent;
-      border:1px solid $nearly-white;
-      @include border(4px);
-      font-family: $font;
-      font-size: $fontsize;
-      padding:$halfpadding;
-      &:hover, &:focus, &:active {
-        border:1px solid $funky-black;
-      }
-      &[type="submit"] {
-        background:$shiny-blue;
-        color:$white;
-        font-weight: bold;
-        border:none;
-        margin-top:$halfpadding;
-        margin-bottom:$halfpadding;
-        cursor: pointer;
-        &:hover {
-          background: darken($shiny-blue, 5%);
-        }
-      }
     }
   }
   span {

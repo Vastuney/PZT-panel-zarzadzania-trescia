@@ -7,6 +7,70 @@ function user($searchkey, $value)
     return $user->getUser($searchkey, $value);
   }
 }
+
+function validate($array){
+  foreach($array as $key => $value)
+  {
+    if (!empty($value) && isset($value))
+    {
+      $value = trim($value);
+      $value = stripslashes($value);
+      $value = htmlspecialchars($value);
+      $array[$key] = $value;
+    } else
+      {
+        new Feedback("error", "Autoryzacja danych wykazała błąd");
+        return;
+      }
+  }
+  return $array;
+}
+function extensions() {
+  global $config;
+  $string = " ";
+  $array = $config['uploadExtensions'];
+  $toEnd = count($array);
+  foreach($array as $key => $value)
+  {
+    if (0 === --$toEnd)
+    {
+      $string .= $value;
+    } else
+      {
+        $string .= $value.", ";
+      }
+  }
+  return $string;
+}
+function uploadSize($bytes) {
+    global $config;
+    $units = array('B', 'KB', 'MB', 'GB', 'TB');
+    $precision = 0;
+    $bytes = max($bytes, 0);
+    $pow = floor(($bytes ? log($bytes) : 0) / log(1024));
+    $pow = min($pow, count($units) - 1);
+    $bytes /= pow(1024, $pow);
+    return round($bytes, $precision) . ' ' . $units[$pow];
+}
+function usedSpace($userid) {
+  global $config;
+  $bytestotal = 0;
+  $bytestotal2 = 0;
+  $path = realpath($config['filesPath'].$userid."/");
+  $path2 = realpath($config['codePath'].$userid."/");
+    if($path!==false && $path!='' && file_exists($path)){
+      foreach(new RecursiveIteratorIterator(new RecursiveDirectoryIterator($path, FilesystemIterator::SKIP_DOTS)) as $object){
+        $bytestotal += $object->getSize();
+      }
+    }
+    if($path2!==false && $path2!='' && file_exists($path2)){
+      foreach(new RecursiveIteratorIterator(new RecursiveDirectoryIterator($path2, FilesystemIterator::SKIP_DOTS)) as $object){
+        $bytestotal += $object->getSize();
+      }
+    }
+  return $bytestotal;
+}
+
 class Feedback
 {
   public $state;
@@ -17,16 +81,18 @@ class Feedback
 
     $this->state = $state;
     $this->text = $text;
-    if($this->state === "location")
+    switch ($this->state)
     {
-      $this->location();
-    } else if($this->state === true)
-      {
+      case "location":
+        $this->location();
+        break;
+      case "success":
         $this->success();
-      } else if($this->state === false)
-        {
-          $this->error();
-        }
+        break;
+      case "error":
+        $this->error();
+        break;
+    }
   }
 
   public function error()
@@ -38,7 +104,7 @@ class Feedback
       'text' => $this->text
     ];
     echo json_encode($data);
-    return false;
+    return;
   }
   public function success()
   {
@@ -49,7 +115,7 @@ class Feedback
       'text' => $this->text
     ];
     echo json_encode($data);
-    return true;
+    return;
   }
   public function location()
   {
@@ -60,7 +126,7 @@ class Feedback
       'text' => $this->text
     ];
     echo json_encode($data);
-    return true;
+    return;
   }
 
 }
@@ -125,7 +191,7 @@ class Token
       }
     } else
       {
-        new Feedback(false, "Token nie istnieje");
+        new Feedback("error", "Token nie już aktywny");
       }
 
   }
@@ -137,13 +203,6 @@ class Token
       $sql = "UPDATE `token` SET `used` = used + 1 WHERE token = '{$this->token}'";
       $db = new DB_PDO();
       $result = $db->freeRun($sql);
-      if ($result->rowCount() > 0)
-      {
-        return true;
-      } else
-        {
-          return false;
-        }
     }
   }
 

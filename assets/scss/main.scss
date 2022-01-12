@@ -415,3 +415,41 @@ header {
     }
   }
 }
+.multi-items {
+  width: 100%;
+  height: auto;
+  overflow:hidden;
+  box-sizing: border-box;
+  .multi-items-navigation {
+    width: auto;
+    height: auto;
+    background-color:transparent;
+    box-sizing: border-box;
+    margin-bottom:$padding;
+    ul {
+      @include flex(row, flex-start, center);
+      gap:$halfpadding;
+      padding-top:calc($halfpadding + 3px);
+      box-sizing: border-box;
+      li {
+        padding-bottom:$halfpadding;
+        box-sizing: border-box;
+        border-bottom: 3px solid transparent;
+        cursor: pointer;
+        font-weight: bold;
+        font-size:$fontsize;
+      }
+      li.active {
+        box-sizing: border-box;
+        border-bottom: 3px solid $shiny-blue;
+      }
+    }
+  }
+  .multi-items-item {
+    @include flex(column, flex-start, flex-start);
+    display: none;
+    &.active {
+      display: flex;
+    }
+  }
+}

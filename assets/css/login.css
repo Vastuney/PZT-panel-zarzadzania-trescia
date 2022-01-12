@@ -109,18 +109,22 @@ main form {
   padding: 2.5em 3.5em;
   background: #fdfdfd;
   margin-top: -10em;
+  gap: 1em;
 }
-main form h2 {
-  font-size: 1.5em;
-  margin-bottom: 1em;
-}
-main form label {
+main form div {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
   width: 100%;
+}
+main form div label {
+  min-width: 50px;
   height: auto;
   color: #c1c0c0;
   padding: 1em;
 }
-main form input {
+main form div input {
   width: 100%;
   height: auto;
   background: transparent;
@@ -132,10 +136,10 @@ main form input {
   font-size: 1.1em;
   padding: 1em;
 }
-main form input:hover, main form input:focus, main form input:active {
+main form div input:hover, main form div input:focus, main form div input:active {
   border: 1px solid #1f1f1f;
 }
-main form input[type=submit] {
+main form div input[type=submit] {
   background: #2e2bff;
   color: #ffffff;
   font-weight: bold;
@@ -144,8 +148,21 @@ main form input[type=submit] {
   margin-bottom: 1em;
   cursor: pointer;
 }
-main form input[type=submit]:hover {
+main form div input[type=submit]:hover {
   background: #1512ff;
+}
+main form div input[type=text] {
+  border: 1px solid #c1c0c0;
+  -webkit-border-radius: 4px;
+  -moz-border-radius: 4px;
+  border-radius: 4px;
+}
+main form div input[type=text]:hover, main form div input[type=text]:focus, main form div input[type=text]:active {
+  border: 1px solid #1f1f1f;
+}
+main form h2 {
+  font-size: 1.5em;
+  margin-bottom: 1em;
 }
 main span {
   color: #c1c0c0;

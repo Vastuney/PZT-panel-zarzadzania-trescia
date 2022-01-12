@@ -31,7 +31,28 @@ require($_SERVER["DOCUMENT_ROOT"]."/includes/root/header.php");
               </div>
             </div>
             <div class="container">
-
+              <div class="multi-items">
+                <div class="multi-items-navigation">
+                  <ul>
+                    <li class="multi_item_href active" for="#user">Użytkownik</li>
+                    <li class="multi_item_href" for="#notifications">Powiadomienia</li>
+                    <li class="multi_item_href" for="#share">Udostępnianie</li>
+                    <li class="multi_item_href" for="#data">Dane</li>
+                  </ul>
+                </div>
+                <div class="multi-items-item active" data-item="#user">
+                  <h3>Użytkownik</h3>
+                </div>
+                <div class="multi-items-item" data-item="#notifications">
+                  <h3>Powiadomienia</h3>
+                </div>
+                <div class="multi-items-item" data-item="#share">
+                  <h3>Udostępnianie</h3>
+                </div>
+                <div class="multi-items-item" data-item="#data">
+                  <h3>Dane</h3>
+                </div>
+              </div>
               </div>
 
 <?php require($_SERVER["DOCUMENT_ROOT"]."/includes/root/footer.php"); ?>

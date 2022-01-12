@@ -126,6 +126,30 @@ $(document).ready(function () {
           }
       });
     });
+    $('.deleteNotifications').click(function(){
+      if (confirm('Na pewno chcesz usunąć powiadomienia?')) {
+        $.ajax({
+            type: "POST",
+            url: "../lib/main.php",
+            data: {
+              method: "deleteNotifications"
+            },
+            timeout: 800000,
+            success: function (data) {
+                data = $.parseJSON(data);
+                if(data['return'] == "location") {
+                  window.location.href = data['text'];
+                } else {
+                  console.log(data['return'] + data["text"]);
+                  feedback(data['return'], data['text']);
+                }
+            },
+            error: function (e) {
+                console.log("ERROR : ", e);
+            }
+        });
+      }
+    });
 
 
 });

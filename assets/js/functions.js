@@ -26,3 +26,10 @@ $('.close').click(function(){
 $('button.upload').click(function(){
   $(this).next("input[type='file']").click();
 });
+$('.multi_item_href').click(function(){
+  var href = $(this).attr("for");
+  $(this).parent().find(".multi_item_href.active").removeClass("active");
+  $(this).parent().parent().parent().find(".multi-items-item.active").removeClass("active");
+  $(this).addClass("active");
+  $(this).parent().parent().parent().find("div[data-item='"+href+"']").addClass("active");
+});

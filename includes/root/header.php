@@ -3,7 +3,7 @@
   <body>
     <div class="site">
       <nav>
-        <div class="logo"><i class="fas fa-crow"></i></div>
+        <div class="logo"><a href="/index.php"><i class="fas fa-crow"></i></a></div>
         <ul>
           <li><a href="/index.php">Pliki</a></li>
           <li><a href="/settings.php">Ustawienia</a></li>
@@ -12,13 +12,15 @@
       </nav>
       <header>
         <div class="top">
-          <div class="search"><i class="fas fa-search"></i><form method="Post"><input type="text" name="value" placeholder="Szukaj..." required></form></div>
+          <div class="search"><i class="fas fa-search"></i><form><input id="search" type="text" name="value" placeholder="Szukaj..." required></form></div>
           <div class="panel">
             <li class="dropdown">
               <i class="fas fa-bell"></i>
               <ul class="dropdown">
-                <li><a href="#">Dawid udostępnił Ci plik</a></li>
-                <li><a href="#">Zaaktualizuj hasło</a></li>
+                <?php
+                  $class = new Notifications("1");
+                  $class->showNotifications();
+                ?>
               </ul>
             </li>
             <li class="dropdown">
